@@ -1,4 +1,4 @@
-package daytwojava;
+package com.daytwojava;
 
 public class Division {
 public void division (int num1, int num2 ) {

@@ -1,4 +1,4 @@
-package daytwojava;
+package com.daytwojava;
 
 public class Voter {
   public void validateAge(int age) {

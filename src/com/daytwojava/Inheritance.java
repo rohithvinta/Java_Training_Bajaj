@@ -1,4 +1,4 @@
-package daytwojava;
+package com.daytwojava;
 
 class Shapeinherit {
 	int sides;

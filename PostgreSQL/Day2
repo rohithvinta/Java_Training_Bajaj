@@ -1,0 +1,533 @@
+Last login: Mon Jan 16 11:08:06 on ttys000
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+L-F0QFT6PL70:~ vintarohith$ /Library/PostgreSQL/15/scripts/runpsql.sh; exit
+Server [localhost]: 
+Database [postgres]: 
+Port [5432]: 
+Username [postgres]: 
+Password for user postgres: 
+psql (15.1)
+Type "help" for help.
+
+postgres=# \l
+                                            List of databases
+   Name    |  Owner   | Encoding | Collate | Ctype | ICU Locale | Locale Provider |   Access privileges   
+-----------+----------+----------+---------+-------+------------+-----------------+-----------------------
+ firstday  | postgres | UTF8     | C       | C     |            | libc            | 
+ postgres  | postgres | UTF8     | C       | C     |            | libc            | 
+ template0 | postgres | UTF8     | C       | C     |            | libc            | =c/postgres          +
+           |          |          |         |       |            |                 | postgres=CTc/postgres
+ template1 | postgres | UTF8     | C       | C     |            | libc            | =c/postgres          +
+           |          |          |         |       |            |                 | postgres=CTc/postgres
+(4 rows)
+
+postgres=# \c firstday
+You are now connected to database "firstday" as user "postgres".
+firstday=# \d
+Did not find any relations.
+firstday=# \c postgres
+You are now connected to database "postgres" as user "postgres".
+postgres=# \d
+           List of relations
+ Schema |    Name    | Type  |  Owner   
+--------+------------+-------+----------
+ public | department | table | postgres
+ public | employee   | table | postgres
+(2 rows)
+
+postgres=# select * from employee;
+ eid  |  ename  | salary 
+------+---------+--------
+  102 | Jaideep |  80000
+ 1002 | Rohan   |  30000
+ 1001 | Rohith  |  90000
+(3 rows)
+
+postgres=# select * from department;
+ did | name 
+-----+------
+(0 rows)
+postgres=# INSERT INTO department VALUES (1,'physics'),(2,'mathematics'),(3,'chemistry'),(4,'science'),(5,'computers');
+INSERT 0 5
+postgres=# select * from department;
+ did |    name     
+-----+-------------
+   1 | physics
+   2 | mathematics
+   3 | chemistry
+   4 | science
+   5 | computers
+(5 rows)
+postgres=# \d employee;
+              Table "public.employee"
+ Column |  Type   | Collation | Nullable | Default 
+--------+---------+-----------+----------+---------
+ eid    | integer |           | not null | 
+ ename  | text    |           | not null | 
+ salary | real    |           |          | 
+Indexes:
+    "employee_pkey" PRIMARY KEY, btree (eid)
+
+postgres=# alter table employee add did INT;
+ALTER TABLE
+postgres=# \d employee;
+              Table "public.employee"
+ Column |  Type   | Collation | Nullable | Default 
+--------+---------+-----------+----------+---------
+ eid    | integer |           | not null | 
+ ename  | text    |           | not null | 
+ salary | real    |           |          | 
+ did    | integer |           |          | 
+Indexes:
+    "employee_pkey" PRIMARY KEY, btree (eid)
+
+postgres=# ALTER TABLE employee ADD Constraint fk_employee_department FOREIGN KEY(did) REFERENCES department(did);
+ALTER TABLE
+postgres=# select * from employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  80000 |    
+ 1002 | Rohan   |  30000 |    
+ 1001 | Rohith  |  90000 |    
+(3 rows)
+
+postgres=# UPDATE employee set did=1 WHERE eid=102;
+UPDATE 1
+postgres=# UPDATE employee set did=3 WHERE eid=1002;
+UPDATE 1
+postgres=# select * from employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  90000 |    
+  102 | Jaideep |  80000 |   1
+ 1002 | Rohan   |  30000 |   3
+(3 rows)
+
+postgres=# SELECT * FROM employee
+postgres-# ;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  90000 |    
+  102 | Jaideep |  80000 |   1
+ 1002 | Rohan   |  30000 |   3
+(3 rows)
+
+postgres=# SELECT * from employee e inner join department d on e.did = d.did;
+ eid  |  ename  | salary | did | did |   name    
+------+---------+--------+-----+-----+-----------
+  102 | Jaideep |  80000 |   1 |   1 | physics
+ 1002 | Rohan   |  30000 |   3 |   3 | chemistry
+(2 rows)
+
+postgres=# UPDATE employee
+postgres-# SET salary = salary*0.50;
+UPDATE 3
+postgres=# select *  from employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  45000 |    
+  102 | Jaideep |  40000 |   1
+ 1002 | Rohan   |  15000 |   3
+(3 rows)
+
+  [Bookmarked 16-Jan-2023 at 11:58:53 AM]
+postgres=# SELECT employee eid,ename,did,salary
+postgres-# FROM employee e
+postgres-# WHERE salary > (SELECT AVG(salary)
+postgres(# FROM employee
+postgres(# WHERE did=e.did);
+
+postgres=# SELECT eid,ename,did,salary
+FROM employee e
+WHERE salary > (SELECT AVG(salary)
+FROM employee
+WHERE did=e.did);
+ eid | ename | did | salary 
+-----+-------+-----+--------
+(0 rows)
+postgres=# UPDATE employee
+SET salary = salary*0.50
+WHERE eid IN (SELECT eid FROM employee WHERE eid >= 103);
+UPDATE 2
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  40000 |   1
+ 1001 | Rohith  |  22500 |    
+ 1002 | Rohan   |   7500 |   3
+(3 rows)
+
+postgres=# SELECT * FROM employee e WHERE salary>(select AVG(salary) FROM employee WHERE did=e.did);
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# SELECT * FROM employee e WHERE SALARY>(select AVG(salary) FROM employee WHERE did=e.did);
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# SELECT * FROM employee e WHERE SALARY>( select AVG(salary) FROM employee WHERE did=e.did);
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# select avg(salary) from employee;
+        avg         
+--------------------
+ 23333.333333333332
+(1 row)
+
+postgres=# select * from employee e where salary > (select avg(salary) from employee where did = e.did)
+postgres-# ;
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# select * from employee e where salary > (select avg(salary) from employee where did = 1);
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# UPDATE employee set did=2 where salary=22500;
+UPDATE 1
+postgres=# select * from employee e where salary > (select avg(salary) from employee where did = 1);
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# SELECT * FROM employee e WHERE SALARY>(select AVG(salary) FROM employee WHERE did=e.did);
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  40000 |   1
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+(3 rows)
+
+postgres=# SELECT * FROM employee e WHERE SALARY>(select AVG(salary) FROM employee WHERE did=e.did);
+ eid | ename | salary | did 
+-----+-------+--------+-----
+(0 rows)
+
+postgres=# select avg(salary) from employee;
+        avg         
+--------------------
+ 23333.333333333332
+(1 row)
+
+postgres=# select * from employee where salary > (select avg(salary) from employee);
+ eid |  ename  | salary | did 
+-----+---------+--------+-----
+ 102 | Jaideep |  40000 |   1
+(1 row)
+
+postgres=# select * from employee
+postgres-# ;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  40000 |   1
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+(3 rows)
+
+postgres=# insert into employee (eid,ename,salary,did) values ( 105,'koushi',1,1);
+INSERT 0 1
+postgres=# select * from employee
+;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  40000 |   1
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+  105 | koushi  |      1 |   1
+(4 rows)
+
+postgres=# SELECT * FROM employee e WHERE SALARY>(select AVG(salary) FROM employee WHERE did=e.did);
+ eid |  ename  | salary | did 
+-----+---------+--------+-----
+ 102 | Jaideep |  40000 |   1
+(1 row)
+
+postgres=# SELECT * FROM employee  WHERE SALARY>(select AVG(salary) FROM employee);
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  40000 |   1
+ 1001 | Rohith  |  22500 |   2
+(2 rows)
+
+postgres=# select AVG(salary) FROM employee
+postgres-# ;
+   avg    
+----------
+ 17500.25
+(1 row)
+postgres=# SELECT (eid,ename,name) FROM employee full outer join department on employee.did=department.did;
+            row            
+---------------------------
+ (102,Jaideep,physics)
+ (1002,Rohan,chemistry)
+ (1001,Rohith,mathematics)
+ (105,koushi,physics)
+ (,,computers)
+ (,,science)
+(6 rows)
+postgres=# BEGIN
+postgres-# ;
+BEGIN
+postgres=*# DELETE FROM employee WHERE eid = 102;
+DELETE 1
+postgres=*# SELECT * FROM employee;
+ eid  | ename  | salary | did 
+------+--------+--------+-----
+ 1002 | Rohan  |   7500 |   3
+ 1001 | Rohith |  22500 |   2
+  105 | koushi |      1 |   1
+(3 rows)
+
+postgres=*# ROLLBACK;
+ROLLBACK
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  40000 |   1
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+  105 | koushi  |      1 |   1
+(4 rows)
+
+postgres=# UPDATE employee SET eid=1005 WHERE ename='koushi';
+UPDATE 1
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+  102 | Jaideep |  40000 |   1
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+ 1005 | koushi  |      1 |   1
+(4 rows)
+
+postgres=# UPDATE employee SET eid=1008 WHERE ename='Jaideep';
+UPDATE 1
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+ 1005 | koushi  |      1 |   1
+ 1008 | Jaideep |  40000 |   1
+(4 rows)
+
+postgres=# INSERT INTO employee VALUES(1007,'Maruti',25000,4);
+INSERT 0 1
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+ 1005 | koushi  |      1 |   1
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+(5 rows)
+
+postgres=# UPDATE employee SET salary=35000 WHERE ename='koushi';
+UPDATE 1
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1005 | koushi  |  35000 |   1
+(5 rows)
+
+postgres=# ROLLBACK;
+WARNING:  there is no transaction in progress
+ROLLBACK
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1005 | koushi  |  35000 |   1
+(5 rows)
+
+postgres=# BEGIN TRANSACTION;
+BEGIN
+postgres=*# INSERT INTO employee VALUES(1004,'Dheeraj',25000,5);
+INSERT 0 1
+postgres=*# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1002 | Rohan   |   7500 |   3
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1005 | koushi  |  35000 |   1
+ 1004 | Dheeraj |  25000 |   5
+(6 rows)
+
+postgres=*# UPDATE employee SET salary=30000 WHERE salary=7500;
+UPDATE 1
+postgres=*# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1005 | koushi  |  35000 |   1
+ 1004 | Dheeraj |  25000 |   5
+ 1002 | Rohan   |  30000 |   3
+(6 rows)
+
+postgres=*# COMMIT;
+COMMIT
+postgres=# CREATE INDEX employeeIndex ON employee(ename);
+CREATE INDEX
+postgres=# SELECT * FROM employee;l
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1005 | koushi  |  35000 |   1
+ 1004 | Dheeraj |  25000 |   5
+ 1002 | Rohan   |  30000 |   3
+(6 rows)
+postgres=# EXPLAIN SELECT * FROM employee WHERE eid=1001;
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Seq Scan on employee  (cost=0.00..1.07 rows=1 width=44)
+   Filter: (eid = 1001)
+(2 rows)
+
+postgres=# EXPLAIN SELECT * FROM employee WHERE salary>22500;
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Seq Scan on employee  (cost=0.00..1.07 rows=2 width=44)
+   Filter: (salary > '22500'::double precision)
+(2 rows)
+
+postgres=# EXPLAIN SELECT * FROM employee WHERE salary>22500;
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Seq Scan on employee  (cost=0.00..1.07 rows=2 width=44)
+   Filter: (salary > '22500'::double precision)
+(2 rows)
+
+postgres=# EXPLAIN SELECT * FROM employee WHERE eid=1002;
+                       QUERY PLAN                        
+---------------------------------------------------------
+ Seq Scan on employee  (cost=0.00..1.07 rows=1 width=44)
+   Filter: (eid = 1002)
+(2 rows)
+
+postgres=# CREATE VIEW empSalary AS SELECT ename,salary FROM employee;
+CREATE VIEW
+postgres=# SELECT * FROM empSalary;
+  ename  | salary 
+---------+--------
+ Rohith  |  22500
+ Jaideep |  40000
+ Maruti  |  25000
+ koushi  |  35000
+ Dheeraj |  25000
+ Rohan   |  30000
+(6 rows)
+
+postgres=# SELECT * FROM employee WHERE ename='Rohith' OR ename='Rohan';
+ eid  | ename  | salary | did 
+------+--------+--------+-----
+ 1001 | Rohith |  22500 |   2
+ 1002 | Rohan  |  30000 |   3
+(2 rows)
+postgres=# DELETE FROM employee WHERE eid=1002;
+DELETE 1
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1005 | koushi  |  35000 |   1
+ 1004 | Dheeraj |  25000 |   5
+(5 rows)
+
+postgres=# UPDATE employee SET eid=1005 WHERE ename='koushi';
+UPDATE 1
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1004 | Dheeraj |  25000 |   5
+ 1005 | koushi  |  35000 |   1
+(5 rows)
+
+postgres=# UPDATE employee SET eid=1005 WHERE ename='koushik';
+UPDATE 0
+postgres=# UPDATE employee SET ename='Koushik' WHERE ename='koushi';
+UPDATE 1
+postgres=# SELECT * FROM employee;
+ eid  |  ename  | salary | did 
+------+---------+--------+-----
+ 1001 | Rohith  |  22500 |   2
+ 1008 | Jaideep |  40000 |   1
+ 1007 | Maruti  |  25000 |   4
+ 1004 | Dheeraj |  25000 |   5
+ 1005 | Koushik |  35000 |   1
+(5 rows)
+
+postgres=# \d
+           List of relations
+ Schema |    Name    | Type  |  Owner   
+--------+------------+-------+----------
+ public | department | table | postgres
+ public | employee   | table | postgres
+ public | empsalary  | view  | postgres
+(3 rows)
+
+postgres=# \dv
+          List of relations
+ Schema |   Name    | Type |  Owner   
+--------+-----------+------+----------
+ public | empsalary | view | postgres
+(1 row)
+postgres=# SELECT * FROM EmpArray;
+ multinumbers | ename 
+--------------+-------
+(0 rows)
+                                               
+postgres=# INSERT INTO EmpArray VALUES (array['1234','4321'],'RohithVinta');
+INSERT 0 1
+postgres=# INSERT INTO EmpArray values (array['9876','6789','7667'],'JaideepVaranasi');
+INSERT 0 1
+postgres=# SELECT * FROM EmpArray;
+   multinumbers   |      ename      
+------------------+-----------------
+ {1234,4321}      | RohithVinta
+ {9876,6789,7667} | JaideepVaranasi
+(2 rows)
+
+postgres=# INSERT INTO EmpArray VALUES (array['1234','5678','9876','2013'],'Vignesh');
+INSERT 0 1
+postgres=# SELECT * FROM EmpArray;
+     multinumbers      |      ename      
+-----------------------+-----------------
+ {1234,4321}           | RohithVinta
+ {9876,6789,7667}      | JaideepVaranasi
+ {1234,5678,9876,2013} | Vignesh
+(3 rows)
+
+postgres=# 

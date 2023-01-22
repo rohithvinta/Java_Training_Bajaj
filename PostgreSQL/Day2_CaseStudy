@@ -1,0 +1,328 @@
+Last login: Tue Jan 17 18:32:11 on ttys001
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+L-F0QFT6PL70:~ vintarohith$ /Library/PostgreSQL/15/scripts/runpsql.sh; exit
+Server [localhost]: 
+Database [postgres]: 
+Port [5432]: 
+Username [postgres]: 
+Password for user postgres: 
+psql (15.1)
+Type "help" for help.
+
+postgres=# \l
+                                                 List of databases
+        Name        |  Owner   | Encoding | Collate | Ctype | ICU Locale | Locale Provider |   Access privileges   
+--------------------+----------+----------+---------+-------+------------+-----------------+-----------------------
+ dphone_corporation | postgres | UTF8     | C       | C     |            | libc            | 
+ firstday           | postgres | UTF8     | C       | C     |            | libc            | 
+ postgres           | postgres | UTF8     | C       | C     |            | libc            | 
+ template0          | postgres | UTF8     | C       | C     |            | libc            | =c/postgres          +
+                    |          |          |         |       |            |                 | postgres=CTc/postgres
+ template1          | postgres | UTF8     | C       | C     |            | libc            | =c/postgres          +
+                    |          |          |         |       |            |                 | postgres=CTc/postgres
+(5 rows)
+
+...skipping...
+                                                 List of databases
+        Name        |  Owner   | Encoding | Collate | Ctype | ICU Locale | Locale Provider |   Access privileges   
+--------------------+----------+----------+---------+-------+------------+-----------------+-----------------------
+ dphone_corporation | postgres | UTF8     | C       | C     |            | libc            | 
+ firstday           | postgres | UTF8     | C       | C     |            | libc            | 
+ postgres           | postgres | UTF8     | C       | C     |            | libc            | 
+ template0          | postgres | UTF8     | C       | C     |            | libc            | =c/postgres          +
+                    |          |          |         |       |            |                 | postgres=CTc/postgres
+ template1          | postgres | UTF8     | C       | C     |            | libc            | =c/postgres          +
+                    |          |          |         |       |            |                 | postgres=CTc/postgres
+(5 rows)
+
+~
+~
+postgres=# \c dphone_corporation
+You are now connected to database "dphone_corporation" as user "postgres".
+dphone_corporation=# \d
+             List of relations
+ Schema |     Name      | Type  |  Owner   
+--------+---------------+-------+----------
+ public | buyingdetails | table | postgres
+ public | customer      | table | postgres
+ public | referral      | table | postgres
+ public | users         | table | postgres
+(4 rows)
+
+dphone_corporation=# \d users
+                 Table "public.users"
+   Column   |  Type   | Collation | Nullable | Default 
+------------+---------+-----------+----------+---------
+ userid     | integer |           | not null | 
+ first_name | text    |           | not null | 
+ last_name  | text    |           | not null | 
+ address    | text    |           | not null | 
+ mobile     | text    |           | not null | 
+ email      | text    |           | not null | 
+ username   | text    |           | not null | 
+ password   | text    |           | not null | 
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (userid)
+Referenced by:
+    TABLE "referral" CONSTRAINT "referral_userid_fkey" FOREIGN KEY (userid) REFERENCES users(userid)
+
+dphone_corporation=# INSERT INTO users VALUES(1001,'Rohith','Vinta','Hyderabad','8989989812','rohith2001@gmail.com','Rohith_Vinta','Rohith@2001');
+INSERT 0 1
+dphone_corporation=# INSERT INTO users VALUES(1002,'Jaideep','Varanasi','Pune','8989989813','jaideep2002@gmail.com','Jaideep_Varanasi','Jaideep@2002');
+INSERT 0 1
+dphone_corporation=# INSERT INTO users VALUES(1003,'Maruti','Kameshwar','Mumbai','8989989814','maruti2003@gmail.com','Maruti_Kameshwar','Maruti@2003');
+INSERT 0 1
+dphone_corporation=# INSERT INTO users VALUES(1004,'Dheeraj','Krishna','Chennai','8989989815','dheeraj2004@gmail.com','Dheeraj_Krishna','Maruti@2004');
+INSERT 0 1
+dphone_corporation=# INSERT INTO users VALUES(1005,'Kaushik','Appani','Delhi','8989989816','kaushik2005@gmail.com','Kaushik_Appani','Kaushik@2005');
+INSERT 0 1
+dphone_corporation=# SELECT * FROM users;
+ userid | first_name | last_name |  address  |   mobile   |           email           |     username     |   password   
+--------+------------+-----------+-----------+------------+---------------------------+------------------+--------------
+      1 | maruti     | kameshwar | mumbai    | 8186837509 | marutikameshwar@gmail.com | marutikameshwar  | maruti123
+      4 | koushiq    | appani    | vellore   | 7895342978 | appanikoushiq@gmail.com   | appanikoushiq    | koushiq123
+   1001 | Rohith     | Vinta     | Hyderabad | 8989989812 | rohith2001@gmail.com      | Rohith_Vinta     | Rohith@2001
+   1002 | Jaideep    | Varanasi  | Pune      | 8989989813 | jaideep2002@gmail.com     | Jaideep_Varanasi | Jaideep@2002
+   1003 | Maruti     | Kameshwar | Mumbai    | 8989989814 | maruti2003@gmail.com      | Maruti_Kameshwar | Maruti@2003
+   1004 | Dheeraj    | Krishna   | Chennai   | 8989989815 | dheeraj2004@gmail.com     | Dheeraj_Krishna  | Maruti@2004
+   1005 | Kaushik    | Appani    | Delhi     | 8989989816 | kaushik2005@gmail.com     | Kaushik_Appani   | Kaushik@2005
+(7 rows)
+
+dphone_corporation=# DELETE FROM users WHERE userid=1 or userid=4;
+DELETE 2
+dphone_corporation=# SELECT * FROM users;
+ userid | first_name | last_name |  address  |   mobile   |         email         |     username     |   password   
+--------+------------+-----------+-----------+------------+-----------------------+------------------+--------------
+   1001 | Rohith     | Vinta     | Hyderabad | 8989989812 | rohith2001@gmail.com  | Rohith_Vinta     | Rohith@2001
+   1002 | Jaideep    | Varanasi  | Pune      | 8989989813 | jaideep2002@gmail.com | Jaideep_Varanasi | Jaideep@2002
+   1003 | Maruti     | Kameshwar | Mumbai    | 8989989814 | maruti2003@gmail.com  | Maruti_Kameshwar | Maruti@2003
+   1004 | Dheeraj    | Krishna   | Chennai   | 8989989815 | dheeraj2004@gmail.com | Dheeraj_Krishna  | Maruti@2004
+   1005 | Kaushik    | Appani    | Delhi     | 8989989816 | kaushik2005@gmail.com | Kaushik_Appani   | Kaushik@2005
+(5 rows)
+
+dphone_corporation=# \d
+             List of relations
+ Schema |     Name      | Type  |  Owner   
+--------+---------------+-------+----------
+ public | buyingdetails | table | postgres
+ public | customer      | table | postgres
+ public | referral      | table | postgres
+ public | users         | table | postgres
+(4 rows)
+
+dphone_corporation=# \d referral
+                    Table "public.referral"
+       Column        |  Type   | Collation | Nullable | Default 
+---------------------+---------+-----------+----------+---------
+ referralid          | integer |           | not null | 
+ referral_first_name | text    |           | not null | 
+ referral_last_name  | text    |           | not null | 
+ mobile              | text    |           | not null | 
+ email               | text    |           | not null | 
+ userid              | integer |           | not null | 
+ date_of_referral    | date    |           | not null | 
+ referral_points     | integer |           |          | 
+ status              | text    |           |          | 
+Indexes:
+    "referral_referralid_key" UNIQUE CONSTRAINT, btree (referralid)
+Foreign-key constraints:
+    "referral_userid_fkey" FOREIGN KEY (userid) REFERENCES users(userid)
+
+dphone_corporation=# INSERT INTO referral VALUES(101,'Kaushik','Appani','8989989816','kaushik2005@gmail.com',1003,'2023-01-16',1234,'Pending');
+INSERT 0 1
+dphone_corporation=# SELECT * FROM referral;
+ referralid | referral_first_name | referral_last_name |   mobile   |         email         | userid | date_of_referral | referral_points | status  
+------------+---------------------+--------------------+------------+-----------------------+--------+------------------+-----------------+---------
+        101 | Kaushik             | Appani             | 8989989816 | kaushik2005@gmail.com |   1003 | 2023-01-16       |            1234 | Pending
+(1 row)
+
+dphone_corporation=# 
+dphone_corporation=# 
+dphone_corporation=# 
+dphone_corporation=# INSERT INTO referral VALUES(102,'Arya','Kommineni','8989989989','arya2002@gmail.com',1004,'2023-01-14',1000,'Accepted');
+INSERT 0 1
+
+dphone_corporation=# INSERT INTO referral VALUES(103,'Ramakrishna','Akkala','8979787979','ramakrishna2003@gmail.com',1005,'2022-12-11',800,'Accepted'),
+(104,'Vignesh','Vinta','8998677610','vignesh2013@gmail.com',1001,'2023-01-02',1000,'Accepted'),
+(105,'Yogi','Desu','8129985988','yogi2001@gmail.com',1003,'2022-12-15',700,'Pending');
+INSERT 0 3
+dphone_corporation=# SELECT * FROM referral;
+ referralid | referral_first_name | referral_last_name |   mobile   |           email           | userid | date_of_referral | referral_points |  status  
+------------+---------------------+--------------------+------------+---------------------------+--------+------------------+-----------------+----------
+        101 | Kaushik             | Appani             | 8989989816 | kaushik2005@gmail.com     |   1003 | 2023-01-16       |            1234 | Pending
+        102 | Arya                | Kommineni          | 8989989989 | arya2002@gmail.com        |   1004 | 2023-01-14       |            1000 | Accepted
+        103 | Ramakrishna         | Akkala             | 8979787979 | ramakrishna2003@gmail.com |   1005 | 2022-12-11       |             800 | Accepted
+        104 | Vignesh             | Vinta              | 8998677610 | vignesh2013@gmail.com     |   1001 | 2023-01-02       |            1000 | Accepted
+        105 | Yogi                | Desu               | 8129985988 | yogi2001@gmail.com        |   1003 | 2022-12-15       |             700 | Pending
+(5 rows)
+
+dphone_corporation=# \d
+             List of relations
+ Schema |     Name      | Type  |  Owner   
+--------+---------------+-------+----------
+ public | buyingdetails | table | postgres
+ public | customer      | table | postgres
+ public | referral      | table | postgres
+ public | users         | table | postgres
+(4 rows)
+
+dphone_corporation=# select * from buyingdetails;
+ customerid | userid | purchase_date | product_name 
+------------+--------+---------------+--------------
+(0 rows)
+
+dphone_corporation=# \d customer;
+                Table "public.customer"
+   Column   |  Type   | Collation | Nullable | Default 
+------------+---------+-----------+----------+---------
+ customerid | integer |           | not null | 
+ first_name | text    |           | not null | 
+ last_name  | text    |           | not null | 
+ email      | text    |           | not null | 
+ mobile     | text    |           | not null | 
+Indexes:
+    "customer_pkey" PRIMARY KEY, btree (customerid)
+Referenced by:
+    TABLE "buyingdetails" CONSTRAINT "buyingdetails_customerid_fkey" FOREIGN KEY (customerid) REFERENCES customer(customerid)
+
+dphone_corporation=# INSERT INTO buying \d customer
+                Table "public.customer"
+   Column   |  Type   | Collation | Nullable | Default 
+------------+---------+-----------+----------+---------
+ customerid | integer |           | not null | 
+ first_name | text    |           | not null | 
+ last_name  | text    |           | not null | 
+ email      | text    |           | not null | 
+ mobile     | text    |           | not null | 
+Indexes:
+    "customer_pkey" PRIMARY KEY, btree (customerid)
+Referenced by:
+    TABLE "buyingdetails" CONSTRAINT "buyingdetails_customerid_fkey" FOREIGN KEY (customerid) REFERENCES customer(customerid)
+
+dphone_corporation=# INSERT INTO customer VALUES(1221,'Rakesh','Singh','rakeshsingh001@gmail.com','8978675645');
+INSERT 0 1
+
+dphone_corporation=# INSERT INTO customer VALUES(1222,'Mahesh','Singh','Maheshsingh002@gmail.com','7978675633'),
+(1223,'Ram','Charan','ramcharan003@gmail.com','8765432123'),
+(1224,'Mahidhar','Rayapati','mahidharrayapati004@gmail.com','6786755344'),
+dphone_corporation-# (1225,'Charan','Konda','charankonda005@gmail.com','9162837465');
+INSERT 0 4
+dphone_corporation=# SELECT *  FROM customer;
+ customerid | first_name | last_name |             email             |   mobile   
+------------+------------+-----------+-------------------------------+------------
+       1221 | Rakesh     | Singh     | rakeshsingh001@gmail.com      | 8978675645
+       1222 | Mahesh     | Singh     | Maheshsingh002@gmail.com      | 7978675633
+       1223 | Ram        | Charan    | ramcharan003@gmail.com        | 8765432123
+       1224 | Mahidhar   | Rayapati  | mahidharrayapati004@gmail.com | 6786755344
+       1225 | Charan     | Konda     | charankonda005@gmail.com      | 9162837465
+(5 rows)
+
+dphone_corporation=# \d
+             List of relations
+ Schema |     Name      | Type  |  Owner   
+--------+---------------+-------+----------
+ public | buyingdetails | table | postgres
+ public | customer      | table | postgres
+ public | referral      | table | postgres
+ public | users         | table | postgres
+(4 rows)
+
+dphone_corporation=# \d buyingdetails
+               Table "public.buyingdetails"
+    Column     |  Type   | Collation | Nullable | Default 
+---------------+---------+-----------+----------+---------
+ customerid    | integer |           | not null | 
+ userid        | integer |           |          | 
+ purchase_date | date    |           |          | 
+ product_name  | text    |           | not null | 
+Foreign-key constraints:
+    "buyingdetails_customerid_fkey" FOREIGN KEY (customerid) REFERENCES customer(customerid)
+
+dphone_corporation=# INSERT INTO buyingdetails VALUES(1225,3001,'2022-11-30','Samsung Ultra'),
+dphone_corporation-# (1224,3002,'2023-01-15','iphone14 ProMax'),
+dphone_corporation-# (1223,3003,'2023-01-10','Oneplus'),
+dphone_corporation-# (1222,3004,'2021-12-30','Nokia'),
+dphone_corporation-# (1221,3005,'2022-08-11','Blackberry');
+INSERT 0 5
+dphone_corporation=# SELECT * FROM buyingdetails;
+ customerid | userid | purchase_date |  product_name   
+------------+--------+---------------+-----------------
+       1225 |   3001 | 2022-11-30    | Samsung Ultra
+       1224 |   3002 | 2023-01-15    | iphone14 ProMax
+       1223 |   3003 | 2023-01-10    | Oneplus
+       1222 |   3004 | 2021-12-30    | Nokia
+       1221 |   3005 | 2022-08-11    | Blackberry
+(5 rows)
+
+dphone_corporation=# select userid,count(userid) from referral group by userid;
+ userid | count 
+--------+-------
+   1003 |     2
+   1004 |     1
+   1001 |     1
+   1005 |     1
+(4 rows)
+
+dphone_corporation=# select userid, sum(referral_points) from referral group by userid;
+ userid | sum  
+--------+------
+   1003 | 1934
+   1004 | 1000
+   1001 | 1000
+   1005 |  800
+(4 rows)
+
+dphone_corporation=# select first_name,last_name,mobile from customer where customerid=(select customerid from buyingdetails where purchase_date='2022/09/21');
+ first_name | last_name | mobile 
+------------+-----------+--------
+(0 rows)
+
+dphone_corporation=# select first_name,last_name,mobile from customer where customerid=(select customerid from buyingdetails where purchase_date='2023-01-15');
+ first_name | last_name |   mobile   
+------------+-----------+------------
+ Mahidhar   | Rayapati  | 6786755344
+(1 row)
+
+dphone_corporation=# SELECT * FROM customer WHERE customerid=(select customerid from buyingdetails WHERE product_name='Oneplus’);
+dphone_corporation'# 
+dphone_corporation'# ,
+dphone_corporation'# '
+dphone_corporation(# )
+dphone_corporation-# ;
+ customerid | first_name | last_name | email | mobile 
+------------+------------+-----------+-------+--------
+(0 rows)
+
+dphone_corporation=# SELECT * FROM customer WHERE customerid=(select customerid from buyingdetails WHERE product_name='Oneplus');
+ customerid | first_name | last_name |         email          |   mobile   
+------------+------------+-----------+------------------------+------------
+       1223 | Ram        | Charan    | ramcharan003@gmail.com | 8765432123
+(1 row)
+
+dphone_corporation=# create view userview as select first_name,last_name,mobile,email from users;
+CREATE VIEW
+dphone_corporation=# SELECT * FROM userview ORDER by email asc;
+ first_name | last_name |   mobile   |         email         
+------------+-----------+------------+-----------------------
+ Dheeraj    | Krishna   | 8989989815 | dheeraj2004@gmail.com
+ Jaideep    | Varanasi  | 8989989813 | jaideep2002@gmail.com
+ Kaushik    | Appani    | 8989989816 | kaushik2005@gmail.com
+ Maruti     | Kameshwar | 8989989814 | maruti2003@gmail.com
+ Rohith     | Vinta     | 8989989812 | rohith2001@gmail.com
+(5 rows)
+
+dphone_corporation=# SELECT * FROM userview ORDER by mobile desc;
+ first_name | last_name |   mobile   |         email         
+------------+-----------+------------+-----------------------
+ Kaushik    | Appani    | 8989989816 | kaushik2005@gmail.com
+ Dheeraj    | Krishna   | 8989989815 | dheeraj2004@gmail.com
+ Maruti     | Kameshwar | 8989989814 | maruti2003@gmail.com
+ Jaideep    | Varanasi  | 8989989813 | jaideep2002@gmail.com
+ Rohith     | Vinta     | 8989989812 | rohith2001@gmail.com
+(5 rows)
+
+  [Bookmarked 17-Jan-2023 at 11:37:12 PM]
+dphone_corporation=# 

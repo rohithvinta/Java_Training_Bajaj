@@ -1,4 +1,4 @@
-package daytwojava;
+package com.daytwojava;
 
 public class EmployeeTest {
 	public static void main(String[] args) {

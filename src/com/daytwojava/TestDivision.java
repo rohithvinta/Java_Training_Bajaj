@@ -1,4 +1,4 @@
-package daytwojava;
+package com.daytwojava;
 
 public class TestDivision {
 	public static void main(String[] args) throws InterruptedException,ClassNotFoundException{

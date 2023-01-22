@@ -1,4 +1,4 @@
-package daytwojava;
+package com.daytwojava;
 
 
 abstract class ShapeMain {
